@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d2538">
+<title>FishPilot · Oberried</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--ink:#0d2538;--card:rgba(255,255,255,.94)}
+*{box-sizing:border-box} html,body,#map{height:100%;margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+#map{background:#dce7ec}
+.header{position:absolute;z-index:1000;left:12px;right:12px;top:max(12px,env(safe-area-inset-top));max-width:430px;
+background:var(--card);padding:12px 14px;border-radius:16px;box-shadow:0 5px 20px #0002;backdrop-filter:blur(10px)}
+.brand{font-weight:800;font-size:20px}.tag{font-size:12px;color:#4d5d67;margin-top:3px;line-height:1.35}
+.pill{display:inline-block;margin-top:8px;padding:5px 9px;background:#e8f0f3;border-radius:999px;font-size:11px;font-weight:650}
+.info{position:absolute;z-index:1000;left:12px;right:12px;bottom:max(16px,env(safe-area-inset-bottom));max-width:430px;
+background:var(--card);padding:10px 12px;border-radius:14px;box-shadow:0 5px 20px #0002;font-size:12px;line-height:1.4}
+.depth-label{background:white;border:0;box-shadow:0 1px 5px #0004;color:#174a68;font-weight:700;padding:1px 4px}
+.leaflet-control-layers{margin-top:115px!important}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="header">
+ <div class="brand">FishPilot <span style="font-weight:500">· Oberried</span></div>
+ <div class="tag">Verstehe dein Gewässer. Amtliche Tiefenlinien des Brienzersees auf OpenStreetMap.</div>
+ <span class="pill">V0 · Strukturkarte</span>
+</div>
+<div class="info"><b>So testest du V0:</b> Zoome vor Oberried in den See und tippe eine Tiefenlinie an. Noch keine Fangempfehlungen – zuerst muss die Gewässerkarte stimmen.</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map=L.map('map',{zoomControl:true}).setView([46.73658,7.96273],14);
+const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+ maxZoom:19, attribution:'© OpenStreetMap-Mitwirkende'
+}).addTo(map);
+
+function style(f){
+ if(f.properties.shore) return {color:'#24343d',weight:2.2,opacity:.85};
+ const d=f.properties.depth_m;
+ let c=d>=100?'#123d5a':d>=50?'#246788':d>=20?'#4592b1':'#70b5cc';
+ return {color:c,weight:(d%50===0?2.4:1.25),opacity:.9};
+}
+
+fetch('bathymetry.geojson')
+ .then(r=>r.json())
+ .then(data=>{
+   const layer=L.geoJSON(data,{
+     style,
+     onEachFeature:(f,l)=>{
+       if(f.properties.shore) l.bindPopup('<b>Uferlinie</b><br>Referenz 564 m ü. M.');
+       else l.bindPopup('<b>'+f.properties.depth_m+' m Wassertiefe</b><br>Seegrund '+f.properties.elevation_m+' m ü. M.<br><small>Quelle: Amt für Geoinformation Kanton Bern</small>');
+     }
+   }).addTo(map);
+   L.control.layers({'OpenStreetMap':osm},{'Tiefenlinien':layer},{collapsed:false}).addTo(map);
+ })
+ .catch(err=>alert('Bathymetrie konnte nicht geladen werden: '+err));
+
+L.circleMarker([46.73658,7.96273],{radius:5,color:'#111',weight:2,fillColor:'#fff',fillOpacity:1})
+ .addTo(map).bindPopup('<b>Oberried am Brienzersee</b><br>Schiffstation / Orientierungspunkt');
+</script>
+</body></html>
