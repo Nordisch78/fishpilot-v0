@@ -1,97 +1,39 @@
-<!doctype html>
-<html lang="de">
-<head>
-<meta charset="utf-8">
+<!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d2538">
-<title>FishPilot · Oberried</title>
+<title>FishPilot · Oberried V0.5</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-*{box-sizing:border-box}html,body,#map{height:100%;margin:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#102938}
-#map{background:#dce7ec}
-.header{position:absolute;z-index:1000;top:max(12px,env(safe-area-inset-top));left:12px;
-width:min(410px,calc(100% - 24px));background:rgba(255,255,255,.94);padding:11px 13px;border-radius:15px;
-box-shadow:0 4px 18px #0002;backdrop-filter:blur(9px)}
-.brand{font-size:19px;font-weight:800}.sub{font-size:11px;color:#52616a;margin-top:3px;line-height:1.35}
-.pill{display:inline-block;margin-top:6px;padding:4px 8px;background:#e8f0f3;border-radius:999px;font-size:10px;font-weight:700}
-.legend{position:absolute;z-index:999;left:12px;bottom:max(15px,env(safe-area-inset-bottom));
-background:rgba(255,255,255,.94);padding:9px 11px;border-radius:13px;box-shadow:0 3px 14px #0002;
-font-size:11px;line-height:1.6}
-.sym{display:inline-flex;width:18px;height:18px;align-items:center;justify-content:center;margin-right:5px;font-weight:800}
-.leaflet-control-layers{margin-top:105px!important}
-.fp-icon{background:white;border:2px solid #152934;border-radius:50%;width:27px!important;height:27px!important;
-display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;box-shadow:0 2px 7px #0005}
-.fp-square{border-radius:3px}.fp-diamond{transform:rotate(45deg)}.fp-diamond span{transform:rotate(-45deg)}
-.fp-triangle{background:transparent;border:0;box-shadow:none;font-size:28px;line-height:27px}
-.popup-title{font-size:15px;font-weight:800;margin-bottom:5px}.score{font-weight:800}
-</style></head>
-<body>
-<div id="map"></div>
-<div class="header"><div class="brand">FishPilot · Oberried</div>
-<div class="sub">Amtliche Bathymetrie + automatisch erkannte Unterwasserstrukturen auf OpenStreetMap.</div>
-<span class="pill">V0.4 · Terrain Structures</span></div>
-<div class="legend"><b>Strukturtypen</b><br>
-<span class="sym">●</span>Kante / Drop-off<br>
-<span class="sym">■</span>Terrasse / Plateau<br>
-<span class="sym">▲</span>Rücken / Erhebung<br>
-<span class="sym">◆</span>Rinne / Vertiefung
-</div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
+html,body,#map{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.header{position:absolute;z-index:1000;top:12px;left:12px;background:#fffffff0;padding:10px 13px;border-radius:14px;box-shadow:0 3px 15px #0002;max-width:390px}
+.header b{font-size:19px}.header div{font-size:11px;color:#53616a;margin-top:3px}
+.leaflet-control-layers{margin-top:92px!important}.fp{background:white;border:2px solid #18313d;border-radius:50%;width:27px!important;height:27px!important;text-align:center;line-height:23px;font-weight:800;box-shadow:0 2px 6px #0005}
+</style></head><body><div id="map"></div>
+<div class="header"><b>FishPilot · Oberried</b><div>V0.5 · Structure Engine – Fläche, Kanten und Tiefenprofil</div></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
 const map=L.map('map').setView([46.7315,7.966],14);
-const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
- maxZoom:19,attribution:'© OpenStreetMap-Mitwirkende'
-}).addTo(map);
+const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap-Mitwirkende'}).addTo(map);
+const overlays={};
 
-let bathyLayer, structureLayer;
-
-function bathyStyle(f){
- if(f.properties.shore)return {color:'#26363e',weight:2.1,opacity:.8};
- const d=f.properties.depth_m;
- return {color:d>=100?'#174762':d>=50?'#2b718e':d>=20?'#4b96ad':'#70b6c8',
- weight:d%50===0?2.1:1.15,opacity:.8};
-}
-
-fetch('bathymetry.geojson').then(r=>r.json()).then(data=>{
- bathyLayer=L.geoJSON(data,{style:bathyStyle,onEachFeature:(f,l)=>{
-   if(!f.properties.shore)l.bindPopup('<b>'+f.properties.depth_m+' m Wassertiefe</b>');
- }}).addTo(map);
- addControl();
-});
-
-function iconFor(p){
- let cls='fp-icon', txt=p.id;
- if(p.type.includes('Terrasse'))cls+=' fp-square';
- if(p.type.includes('Rinne'))cls+=' fp-diamond';
- if(p.type.includes('Rücken'))return L.divIcon({className:'',html:'<div class="fp-triangle">▲<span style="position:absolute;font-size:9px;left:9px;top:7px;color:white">'+p.id+'</span></div>',iconSize:[27,27],iconAnchor:[13,13]});
- return L.divIcon({className:'',html:'<div class="'+cls+'"><span>'+txt+'</span></div>',iconSize:[27,27],iconAnchor:[13,13]});
-}
-
-fetch('fishpilot_structures.geojson').then(r=>r.json()).then(data=>{
- structureLayer=L.geoJSON(data,{
-   pointToLayer:(f,ll)=>L.marker(ll,{icon:iconFor(f.properties)}),
-   onEachFeature:(f,l)=>{
-     const p=f.properties;
-     l.bindPopup(`<div class="popup-title">${p.type} #${p.id}</div>
-       <b>Tiefe:</b> ${p.depth_min}–${p.depth_max} m<br>
-       <b>Ausdehnung:</b> ca. ${p.length_m} m<br>
-       <b>Fläche:</b> ${Number(p.area_m2).toLocaleString('de-CH')} m²<br>
-       <b>Median Gefälle:</b> ${p.slope_median}°<br>
-       <b>steile Bereiche (P90):</b> ${p.slope_p90}°<br>
-       <b>Terrain-Score:</b> <span class="score">${p.terrain_score}/100</span><br>
-       <small>Score bewertet nur die Geländeausprägung, nicht die Fangchance.</small>`);
-   }
+Promise.all([
+ fetch('bathymetry.geojson').then(r=>r.json()),
+ fetch('fishpilot_structures.geojson').then(r=>r.json()).catch(()=>null),
+ fetch('fishpilot_structure11_v05.geojson').then(r=>r.json())
+]).then(([bathy,pts,detail])=>{
+ overlays['Tiefenlinien']=L.geoJSON(bathy,{style:f=>({color:'#287d9b',weight:1.2,opacity:.72})}).addTo(map);
+ if(pts) overlays['Strukturpunkte V0.4']=L.geoJSON(pts,{pointToLayer:(f,ll)=>L.marker(ll,{icon:L.divIcon({className:'fp',html:f.properties.id,iconSize:[27,27],iconAnchor:[13,13]})})}).addTo(map);
+ overlays['Struktur #11 Detail']=L.geoJSON(detail,{
+  style:f=>{
+   if(f.properties.kind==='plateau') return {color:'#172f3a',weight:2,fillOpacity:.18};
+   if(f.properties.kind==='edge') return {color:'#111',weight:2.8,fillOpacity:.28};
+   return {color:'#111',weight:3,dashArray:'7,6',fillOpacity:0};
+  },
+  onEachFeature:(f,l)=>{
+   const p=f.properties;
+   if(p.kind==='plateau') l.bindPopup(`<b>${p.name}</b><br>Tiefe ${p.depth_min}–${p.depth_max} m<br>Fläche ${Number(p.area_m2).toLocaleString('de-CH')} m²`);
+   if(p.kind==='edge') l.bindPopup(`<b>${p.name}</b><br>Tiefe ${p.depth_min}–${p.depth_max} m<br>Median Gefälle ${p.slope_median}°<br>P90 ${p.slope_p90}°`);
+   if(p.kind==='profile') l.bindPopup(`<b>${p.name}</b><br>${p.length_m} m Messlinie<br>Tiefe ${p.depth_start} → ${p.depth_end} m`);
+  }
  }).addTo(map);
- addControl();
+ L.control.layers({'OpenStreetMap':osm},overlays,{collapsed:false}).addTo(map);
 });
-
-let ctl;
-function addControl(){
- if(ctl) map.removeControl(ctl);
- let overlays={};
- if(bathyLayer)overlays['Amtliche Tiefenlinien']=bathyLayer;
- if(structureLayer)overlays['FishPilot Strukturen']=structureLayer;
- ctl=L.control.layers({'OpenStreetMap':osm},overlays,{collapsed:false}).addTo(map);
-}
 </script></body></html>
