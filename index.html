@@ -1,6 +1,6 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>FishPilot · Oberried V0.6</title>
+<title>FishPilot · Oberried V0.7</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 html,body,#map{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -14,11 +14,11 @@ padding:8px 10px;border-radius:10px;box-shadow:0 2px 10px #0002;font-size:11px;l
 .sw-e{background:rgba(73,111,125,.34);border:1px solid #253f49}
 .sw-l{height:0;border-top:2px dashed #344e59;border-radius:0}
 </style></head><body><div id="map"></div>
-<div class="header"><b>FishPilot · Oberried</b><div>V0.6 · Terrain Map – Strukturen, Kanten und Tiefenprofil</div></div>
+<div class="header"><b>FishPilot · Oberried</b><div>V0.7 · Breakline Engine – Plateau, Oberkante und Unterkante</div></div>
 <div class="legend"><b>Struktur #11</b><br>
-<span class="sw sw-p"></span>Plateau / Terrasse<br>
-<span class="sw sw-e"></span>Kantenbereich<br>
-<span class="sw sw-l"></span>Tiefenprofil
+<span class="sw sw-p"></span>Plateau-Teilbereiche<br>
+<span class="sw sw-e"></span>Oberkante ~25 m<br>
+<span class="sw sw-l"></span>Unterkante ~50 m
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
 const map=L.map('map').setView([46.7315,7.966],14);
@@ -29,7 +29,7 @@ const overlays={};
 Promise.all([
  fetch('bathymetry.geojson').then(r=>r.json()),
  fetch('fishpilot_structures.geojson').then(r=>r.json()).catch(()=>null),
- fetch('fishpilot_structure11_v05.geojson').then(r=>r.json())
+ fetch('fishpilot_structure11_v07.geojson').then(r=>r.json())
 ]).then(([bathy,pts,detail])=>{
  overlays['Tiefenlinien']=L.geoJSON(bathy,{style:f=>{
  const d=Number(f.properties.depth_m||0);
@@ -51,25 +51,24 @@ Promise.all([
       <small>Terrain-Score bewertet nur die Geländeausprägung, nicht die Fangchance.</small>`);
   }
 }).addTo(map);
- overlays['Struktur #11 Detail']=L.geoJSON(detail,{
+ overlays['#11 Breaklines V0.7']=L.geoJSON(detail,{
   style:f=>{
-   if(f.properties.kind==='plateau') return {
-     color:'#466b79',weight:1.4,opacity:.72,
-     fillColor:'#78a8b8',fillOpacity:.10
+   if(f.properties.kind==='plateau_segment') return {
+     color:'#557681',weight:1.1,opacity:.62,fillColor:'#7faab7',fillOpacity:.08
    };
-   if(f.properties.kind==='edge') return {
-     color:'#253f49',weight:1.8,opacity:.88,
-     fillColor:'#496f7d',fillOpacity:.16
+   if(f.properties.kind==='upper_break') return {
+     color:'#203b46',weight:3.2,opacity:.95
    };
-   return {
-     color:'#344e59',weight:2,dashArray:'8,7',opacity:.82,fillOpacity:0
+   if(f.properties.kind==='lower_break') return {
+     color:'#526d77',weight:2.4,opacity:.9,dashArray:'7,5'
    };
+   return {color:'#344e59',weight:2,opacity:.8};
   },
   onEachFeature:(f,l)=>{
    const p=f.properties;
-   if(p.kind==='plateau') l.bindPopup(`<b>${p.name}</b><br>Tiefe ${p.depth_min}–${p.depth_max} m<br>Fläche ${Number(p.area_m2).toLocaleString('de-CH')} m²`);
-   if(p.kind==='edge') l.bindPopup(`<b>${p.name}</b><br>Tiefe ${p.depth_min}–${p.depth_max} m<br>Median Gefälle ${p.slope_median}°<br>P90 ${p.slope_p90}°`);
-   if(p.kind==='profile') l.bindPopup(`<b>${p.name}</b><br>${p.length_m} m Messlinie<br>Tiefe ${p.depth_start} → ${p.depth_end} m`);
+   if(p.kind==='plateau_segment') l.bindPopup(`<b>${p.name}</b><br>Tiefenbereich ${p.depth_min}–${p.depth_max} m<br>Fläche ${Number(p.area_m2).toLocaleString('de-CH')} m²`);
+   if(p.kind==='upper_break') l.bindPopup(`<b>${p.name}</b><br>Referenztiefe ca. ${p.depth_m} m<br>Linienlänge ${p.length_m} m<br><small>Annäherung an die obere Abbruchkante aus dem Geländemodell.</small>`);
+   if(p.kind==='lower_break') l.bindPopup(`<b>${p.name}</b><br>Referenztiefe ca. ${p.depth_m} m<br>Linienlänge ${p.length_m} m<br><small>Annäherung an die untere Abbruchkante aus dem Geländemodell.</small>`);
   }
  }).addTo(map);
  L.control.layers({'OpenStreetMap':osm},overlays,{collapsed:false}).addTo(map);
