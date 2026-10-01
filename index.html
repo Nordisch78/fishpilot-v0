@@ -38,6 +38,15 @@ max-width:min(360px,calc(100vw - 24px))}
 <span class="sw sw-e"></span>Oberkante ~25 m<br>
 <span class="sw sw-l"></span>Unterkante ~50 m
 </div>
+<div id="fp-nav" class="fp-navbox">
+  <div class="fp-navrow">
+    <button id="fp-locate" class="fp-btn">Meine Position</button>
+    <button id="fp-navigate" class="fp-btn fp-btn-primary" disabled>Zur Struktur</button>
+    <button id="fp-stop" class="fp-btn fp-btn-stop" style="display:none">Stop</button>
+  </div>
+  <div id="fp-navstat" class="fp-navstat">Struktur anklicken und „Zur Struktur“ wählen.</div>
+  <div id="fp-accuracy" class="fp-small"></div>
+</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
 const map=L.map('map').setView([46.7315,7.966],14);
 L.control.scale({imperial:false,position:'bottomleft'}).addTo(map);
@@ -172,7 +181,11 @@ function fpStartWatch(centerOnce=false){
    if(centerOnce){map.setView([p.coords.latitude,p.coords.longitude],Math.max(map.getZoom(),16));centerOnce=false;}
  },fpError,{enableHighAccuracy:true,maximumAge:1000,timeout:12000});
 }
-document.getElementById('fp-locate').onclick=()=>fpStartWatch(true);
+document.getElementById('fp-locate').onclick=()=>{
+ fpStat.textContent='GPS wird angefragt …';
+ fpAcc.textContent='Falls iOS fragt: Standortzugriff erlauben.';
+ fpStartWatch(true);
+};
 fpNavBtn.onclick=()=>{
  if(!fpTarget){return;}
  if(fpTargetMarker) map.removeLayer(fpTargetMarker);
@@ -212,14 +225,4 @@ map.on('layeradd',function(e){
 });
 
 </script>
-<div id="fp-nav" class="fp-navbox">
-  <div class="fp-navrow">
-    <button id="fp-locate" class="fp-btn">Meine Position</button>
-    <button id="fp-navigate" class="fp-btn fp-btn-primary" disabled>Zur Struktur</button>
-    <button id="fp-stop" class="fp-btn fp-btn-stop" style="display:none">Stop</button>
-  </div>
-  <div id="fp-navstat" class="fp-navstat">Struktur anklicken und „Zur Struktur“ wählen.</div>
-  <div id="fp-accuracy" class="fp-small"></div>
-</div>
-
 </body></html>
