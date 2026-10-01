@@ -1,0 +1,77 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FishPilot · Oberried V0.6</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html,body,#map{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.header{position:absolute;z-index:1000;top:12px;left:12px;background:#fffffff0;padding:10px 13px;border-radius:14px;box-shadow:0 3px 15px #0002;max-width:390px}
+.header b{font-size:19px}.header div{font-size:11px;color:#53616a;margin-top:3px}
+.leaflet-control-layers{margin-top:92px!important}.fp{background:rgba(255,255,255,.94);border:1.5px solid #18313d;border-radius:50%;width:23px!important;height:23px!important;text-align:center;line-height:20px;font-weight:750;font-size:10px;box-shadow:0 1px 4px #0004}
+.legend{position:absolute;z-index:999;right:12px;bottom:24px;background:rgba(255,255,255,.92);
+padding:8px 10px;border-radius:10px;box-shadow:0 2px 10px #0002;font-size:11px;line-height:1.55}
+.sw{display:inline-block;width:20px;height:8px;margin-right:6px;vertical-align:middle;border-radius:2px}
+.sw-p{background:rgba(120,168,184,.28);border:1px solid #466b79}
+.sw-e{background:rgba(73,111,125,.34);border:1px solid #253f49}
+.sw-l{height:0;border-top:2px dashed #344e59;border-radius:0}
+</style></head><body><div id="map"></div>
+<div class="header"><b>FishPilot · Oberried</b><div>V0.6 · Terrain Map – Strukturen, Kanten und Tiefenprofil</div></div>
+<div class="legend"><b>Struktur #11</b><br>
+<span class="sw sw-p"></span>Plateau / Terrasse<br>
+<span class="sw sw-e"></span>Kantenbereich<br>
+<span class="sw sw-l"></span>Tiefenprofil
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
+const map=L.map('map').setView([46.7315,7.966],14);
+L.control.scale({imperial:false,position:'bottomleft'}).addTo(map);
+const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap-Mitwirkende'}).addTo(map);
+const overlays={};
+
+Promise.all([
+ fetch('bathymetry.geojson').then(r=>r.json()),
+ fetch('fishpilot_structures.geojson').then(r=>r.json()).catch(()=>null),
+ fetch('fishpilot_structure11_v05.geojson').then(r=>r.json())
+]).then(([bathy,pts,detail])=>{
+ overlays['Tiefenlinien']=L.geoJSON(bathy,{style:f=>{
+ const d=Number(f.properties.depth_m||0);
+ return {color:'#247b99',weight:(d%50===0?1.8:1.05),opacity:(d%50===0?.88:.70)};
+},onEachFeature:(f,l)=>{
+ if(f.properties.depth_m) l.bindTooltip(f.properties.depth_m+' m',{sticky:true,direction:'top'});
+}}).addTo(map);
+ if(pts) overlays['Strukturpunkte V0.4']=L.geoJSON(pts,{
+  pointToLayer:(f,ll)=>L.marker(ll,{icon:L.divIcon({className:'fp',html:f.properties.id,iconSize:[23,23],iconAnchor:[11,11]})}),
+  onEachFeature:(f,l)=>{
+    const p=f.properties;
+    l.bindPopup(`<b>${p.type} #${p.id}</b><br>
+      <b>Tiefe:</b> ${p.depth_min}–${p.depth_max} m<br>
+      <b>Ausdehnung:</b> ca. ${p.length_m} m<br>
+      <b>Fläche:</b> ${Number(p.area_m2).toLocaleString('de-CH')} m²<br>
+      <b>Median Gefälle:</b> ${p.slope_median}°<br>
+      <b>steile Bereiche (P90):</b> ${p.slope_p90}°<br>
+      <b>Terrain-Score:</b> ${p.terrain_score}/100<br>
+      <small>Terrain-Score bewertet nur die Geländeausprägung, nicht die Fangchance.</small>`);
+  }
+}).addTo(map);
+ overlays['Struktur #11 Detail']=L.geoJSON(detail,{
+  style:f=>{
+   if(f.properties.kind==='plateau') return {
+     color:'#466b79',weight:1.4,opacity:.72,
+     fillColor:'#78a8b8',fillOpacity:.10
+   };
+   if(f.properties.kind==='edge') return {
+     color:'#253f49',weight:1.8,opacity:.88,
+     fillColor:'#496f7d',fillOpacity:.16
+   };
+   return {
+     color:'#344e59',weight:2,dashArray:'8,7',opacity:.82,fillOpacity:0
+   };
+  },
+  onEachFeature:(f,l)=>{
+   const p=f.properties;
+   if(p.kind==='plateau') l.bindPopup(`<b>${p.name}</b><br>Tiefe ${p.depth_min}–${p.depth_max} m<br>Fläche ${Number(p.area_m2).toLocaleString('de-CH')} m²`);
+   if(p.kind==='edge') l.bindPopup(`<b>${p.name}</b><br>Tiefe ${p.depth_min}–${p.depth_max} m<br>Median Gefälle ${p.slope_median}°<br>P90 ${p.slope_p90}°`);
+   if(p.kind==='profile') l.bindPopup(`<b>${p.name}</b><br>${p.length_m} m Messlinie<br>Tiefe ${p.depth_start} → ${p.depth_end} m`);
+  }
+ }).addTo(map);
+ L.control.layers({'OpenStreetMap':osm},overlays,{collapsed:false}).addTo(map);
+});
+</script></body></html>
