@@ -1,0 +1,20 @@
+{
+  "version": "0.1",
+  "description": "Future FishPilot session/catch event schema. Zero-catch sessions must also be stored.",
+  "fields": {
+    "event_id": "UUID",
+    "structure_id": "e.g. OBR-A002",
+    "started_at": "ISO-8601 datetime",
+    "duration_min": "integer",
+    "target_species": "string",
+    "method": "string",
+    "lure": "string",
+    "caught": "boolean",
+    "species": "string|null",
+    "length_cm": "number|null",
+    "weight_g": "number|null",
+    "notes": "string|null",
+    "weather_ref": "optional future reference",
+    "water_ref": "optional future reference"
+  }
+}
