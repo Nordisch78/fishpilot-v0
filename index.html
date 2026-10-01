@@ -1,6 +1,6 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>FishPilot · Oberried V0.12</title>
+<title>FishPilot · Oberried V0.13</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 html,body,#map{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -14,7 +14,7 @@ padding:8px 10px;border-radius:10px;box-shadow:0 2px 10px #0002;font-size:11px;l
 .sw-e{background:rgba(73,111,125,.34);border:1px solid #253f49}
 .sw-l{height:0;border-top:2px dashed #344e59;border-radius:0}
 
-/* FishPilot V0.12 – mobile structure filter */
+/* FishPilot V0.13 – mobile structure filter */
 #fpFilterBtn{
   position:absolute; top:88px; left:14px; z-index:1200;
   border:0; border-radius:12px; padding:10px 14px; font-weight:700;
@@ -38,6 +38,14 @@ padding:8px 10px;border-radius:10px;box-shadow:0 2px 10px #0002;font-size:11px;l
  #fpFilterPanel{top:150px}
 }
 
+
+#fpTargetBox{
+ position:absolute; right:14px; bottom:78px; z-index:1190; width:min(330px,calc(100vw - 28px));
+ background:rgba(255,255,255,.96); border-radius:14px; padding:10px 12px;
+ box-shadow:0 3px 14px rgba(0,0,0,.2); font-family:system-ui,-apple-system,sans-serif; display:none;
+}
+#fpTargetBox b{font-size:14px}.fp-small{font-size:12px;color:#555;margin-top:3px}
+
 </style>
 <style>
 .fp-navbox{position:absolute;left:12px;bottom:18px;z-index:1000;background:rgba(255,255,255,.94);
@@ -58,6 +66,12 @@ max-width:min(360px,calc(100vw - 24px))}
 
 </head><body>
 
+<div id="fpTargetBox">
+ <b>Angelpositionen</b>
+ <div class="fp-small" id="fpTargetText">Struktur anklicken – FishPilot leitet daraus Oberkante, Kern und Unterkante ab.</div>
+</div>
+
+
 <button id="fpFilterBtn" type="button">Strukturen filtern</button>
 <div id="fpFilterPanel" hidden>
   <div class="fp-title">Strukturfilter</div>
@@ -69,6 +83,8 @@ max-width:min(360px,calc(100vw - 24px))}
     <button class="fp-chip" data-type="Rinne">Rinnen</button>
     <button class="fp-chip" data-type="Plateau">Plateaus</button>
     <button class="fp-chip" data-type="Sattel">Sättel</button>
+    <button class="fp-chip" data-type="Ruecken">Rücken</button>
+    <button class="fp-chip" data-type="Uebergang">Übergänge</button>
   </div>
   <div class="fp-label">Tiefe</div>
   <div class="fp-chips" id="fpDepthChips">
@@ -79,10 +95,18 @@ max-width:min(360px,calc(100vw - 24px))}
     <button class="fp-chip" data-depth="40,80">40–80 m</button>
     <button class="fp-chip" data-depth="80,9999">&gt;80 m</button>
   </div>
+
+  <div class="fp-label">Ausprägung</div>
+  <div class="fp-chips" id="fpQualityChips">
+    <button class="fp-chip active" data-quality="all">Alle</button>
+    <button class="fp-chip" data-quality="stark">stark</button>
+    <button class="fp-chip" data-quality="mittel">mittel</button>
+    <button class="fp-chip" data-quality="schwach">schwach</button>
+  </div>
   <div id="fpCount">Filter bereit</div>
 </div>
 <div id="map"></div>
-<div class="header"><b>FishPilot · Oberried</b><div>V0.12 · Structure Intelligence – Filter, Strukturtypen & GPS</div></div>
+<div class="header"><b>FishPilot · Oberried</b><div>V0.13 · Terrain Intelligence – Klassifikation, Angelpunkte & GPS</div></div>
 <div class="legend"><b>Struktur #11</b><br>
 <span class="sw sw-p"></span>Plateau-Teilbereiche<br>
 <span class="sw sw-e"></span>Oberkante ~25 m<br>
@@ -171,7 +195,7 @@ Promise.all([
     'Steilkante':'◆',
     'Plateau / Terrasse':'●'
    };
-   overlays['Angelstrukturen V0.12']=L.geoJSON(fishingTargets,{
+   overlays['Angelstrukturen V0.13']=L.geoJSON(fishingTargets,{
      pointToLayer:(f,ll)=>L.marker(ll,{icon:L.divIcon({
        className:'',
        html:`<div style="width:28px;height:28px;border-radius:50%;background:white;border:2px solid #173f4d;box-shadow:0 1px 5px #555;display:flex;align-items:center;justify-content:center;font-weight:800;color:#173f4d">${icons[f.properties.structure_type]||'•'}</div>`,
@@ -179,7 +203,7 @@ Promise.all([
      })}),
      onEachFeature:(f,l)=>{
        const p=f.properties;
-       l.bindPopup(`<b>${p.structure_id} · ${p.structure_type}</b><br>${p.catalog_name}<br><b>Tiefe:</b> ${p.depth_m} m<br><b>Gefälle:</b> ${p.slope_deg}°<br><b>Lokaler Reliefindex:</b> ${p.local_relief_index_m} m<br><small>V0.12 automatisch aus der lokalen Geländeform erkannt.</small>`);
+       l.bindPopup(`<b>${p.structure_id} · ${p.structure_type}</b><br>${p.catalog_name}<br><b>Tiefe:</b> ${p.depth_m} m<br><b>Gefälle:</b> ${p.slope_deg}°<br><b>Lokaler Reliefindex:</b> ${p.local_relief_index_m} m<br><small>V0.13 automatisch aus der lokalen Geländeform erkannt.</small>`);
        l.on('click',()=>fpSetTarget(l,p));
      }
    }).addTo(map);
@@ -301,7 +325,7 @@ map.on('layeradd',function(e){
 
 <script>
 (function(){
-  let selectedType='Alle', depth='all';
+  let selectedType='Alle', depth='all', quality='all';
   const btn=document.getElementById('fpFilterBtn'), panel=document.getElementById('fpFilterPanel');
   btn.addEventListener('click',()=>panel.hidden=!panel.hidden);
 
@@ -318,7 +342,9 @@ map.on('layeradd',function(e){
       Nase:['nase','vorsprung'],
       Rinne:['rinne','einbuchtung'],
       Plateau:['plateau','terrasse'],
-      Sattel:['sattel','übergang','uebergang']
+      Sattel:['sattel'],
+      Ruecken:['rücken','ruecken','erhebung'],
+      Uebergang:['übergang','uebergang']
     };
     return (keys[selectedType]||[]).some(k=>s.includes(k));
   }
@@ -330,6 +356,24 @@ map.on('layeradd',function(e){
     let m=s.match(/tiefe[^0-9]{0,20}([0-9]+(?:[.,][0-9]+)?)/i);
     return m ? parseFloat(m[1].replace(',','.')) : null;
   }
+
+  function qualityValue(l,s){
+    const p=l && l.feature && l.feature.properties ? l.feature.properties : {};
+    let q=String(p.quality || p.auspraegung || p.strength || '').toLowerCase();
+    if(q) return q;
+    let slope=null, relief=null;
+    for(const k of ['slope','slope_deg','gefaelle','median_slope']){
+      const v=parseFloat(p[k]); if(Number.isFinite(v)){slope=v;break;}
+    }
+    for(const k of ['relief','relief_m','local_relief','reliefindex']){
+      const v=parseFloat(p[k]); if(Number.isFinite(v)){relief=v;break;}
+    }
+    if(slope===null){ let m=s.match(/gef[aä]lle[^0-9]{0,20}([0-9]+(?:[.,][0-9]+)?)/i); if(m)slope=parseFloat(m[1].replace(',','.')); }
+    if(relief===null){ let m=s.match(/relief(?:index)?[^0-9]{0,20}([0-9]+(?:[.,][0-9]+)?)/i); if(m)relief=parseFloat(m[1].replace(',','.')); }
+    const score=(slope||0)*0.65+(relief||0)*0.8;
+    return score>=22?'stark':score>=11?'mittel':'schwach';
+  }
+
   function apply(){
     let seen=0, shown=0;
     if(!window.map || !map.eachLayer){ document.getElementById('fpCount').textContent='Karte lädt …'; return; }
@@ -342,6 +386,7 @@ map.on('layeradd',function(e){
       }
       seen++;
       let ok=typeOK(s);
+      if(quality!=='all') ok = ok && qualityValue(l,s)===quality;
       if(depth!=='all'){
         const [a,b]=depth.split(',').map(Number), d=depthValue(l,s);
         if(d!==null) ok = ok && d>=a && d<b;
@@ -352,7 +397,7 @@ map.on('layeradd',function(e){
       } else if(l.setOpacity) l.setOpacity(ok?1:0);
       if(ok) shown++;
     });
-    document.getElementById('fpCount').textContent = shown+' von '+seen+' erkannten Kartenobjekten sichtbar';
+    document.getElementById('fpCount').textContent = shown+' von '+seen+' Struktur-/Geländeobjekten sichtbar';
   }
   document.querySelectorAll('#fpTypeChips .fp-chip').forEach(x=>x.onclick=function(){
     document.querySelectorAll('#fpTypeChips .fp-chip').forEach(y=>y.classList.remove('active'));
@@ -362,7 +407,49 @@ map.on('layeradd',function(e){
     document.querySelectorAll('#fpDepthChips .fp-chip').forEach(y=>y.classList.remove('active'));
     this.classList.add('active'); depth=this.dataset.depth; apply();
   });
+  document.querySelectorAll('#fpQualityChips .fp-chip').forEach(x=>x.onclick=function(){
+    document.querySelectorAll('#fpQualityChips .fp-chip').forEach(y=>y.classList.remove('active'));
+    this.classList.add('active'); quality=this.dataset.quality; apply();
+  });
   setTimeout(apply,1600);
+})();
+</script>
+
+
+<script>
+(function(){
+ function classify(s){
+   s=s.toLowerCase();
+   if(/rinne|einbuchtung/.test(s)) return 'Rinne';
+   if(/plateau|terrasse/.test(s)) return 'Plateau';
+   if(/kante|steilabbruch|hangstufe/.test(s)) return 'Kante';
+   if(/sattel/.test(s)) return 'Sattel';
+   if(/rücken|ruecken|erhebung/.test(s)) return 'Rücken';
+   if(/nase|vorsprung/.test(s)) return 'Nase';
+   return 'Struktur';
+ }
+ function nums(s){
+   let m=s.match(/tiefe[^0-9]{0,20}([0-9]+(?:[.,][0-9]+)?)(?:[^0-9]+([0-9]+(?:[.,][0-9]+)?))?/i);
+   if(!m) return null;
+   return [parseFloat(m[1].replace(',','.')),m[2]?parseFloat(m[2].replace(',','.')):null];
+ }
+ setTimeout(function(){
+   if(!window.map || !map.on) return;
+   map.on('popupopen',function(e){
+     const c=e.popup && e.popup.getContent ? String(e.popup.getContent()) : '';
+     const plain=c.replace(/<[^>]+>/g,' ');
+     if(!/OBR-|Struktur|Hang|Nase|Rinne|Kante|Plateau|Rücken|Erhebung/i.test(plain)) return;
+     const typ=classify(plain), d=nums(plain);
+     let detail='Kernpunkt der Struktur';
+     if(d && d[1]!=null){
+       const a=Math.min(d[0],d[1]), b=Math.max(d[0],d[1]), mid=(a+b)/2;
+       detail='Oberkante ~'+a.toFixed(0)+' m · Kern ~'+mid.toFixed(0)+' m · Unterkante ~'+b.toFixed(0)+' m';
+     } else if(d) detail='Kernbereich ~'+d[0].toFixed(0)+' m';
+     const box=document.getElementById('fpTargetBox');
+     document.getElementById('fpTargetText').innerHTML='<b>'+typ+'</b> · '+detail+'<br>Diese Positionen sind Gelände-Ziele, keine Fangprognose.';
+     box.style.display='block';
+   });
+ });
 })();
 </script>
 
