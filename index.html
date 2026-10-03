@@ -1,6 +1,6 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>FishPilot · Oberried V0.19.1</title>
+<title>FishPilot · Oberried V0.20</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 html,body,#map{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -104,7 +104,7 @@ max-width:min(360px,calc(100vw - 24px))}
   <div id="fpCount">15 Strukturen im Gebiet Oberried</div>
 </div>
 <div id="map"></div>
-<div class="header"><b>FishPilot · Oberried</b><div>V0.19.1 · Oberried – Gebiet Oberried · bereinigte Hotspots & GPS</div></div>
+<div class="header"><b>FishPilot · Oberried</b><div>V0.20 · Oberried – Fangjournal · 8 Oberried-Hotspots · GPS</div></div>
 
 <div id="fp-nav" class="fp-navbox">
   <div class="fp-navrow">
@@ -123,7 +123,7 @@ const overlays={};
 
 Promise.all([
  fetch('bathymetry.geojson').then(r=>r.json()),
- fetch('fishpilot_structures_oberried_v0191.geojson').then(r=>r.json())
+ fetch('fishpilot_structures_oberried_v020.geojson').then(r=>r.json())
 ]).then(([bathy,hotspots])=>{
  overlays['Tiefenlinien']=L.geoJSON(bathy,{
    style:f=>{
@@ -356,6 +356,49 @@ map.on('layeradd',function(e){
     });
     remove.forEach(l=>{ try{map.removeLayer(l)}catch(e){} });
   },1900);
+})();
+</script>
+
+
+<style>
+#catchBtn{position:absolute;right:18px;bottom:24px;z-index:1200;border:0;border-radius:16px;padding:13px 17px;background:#123f4a;color:white;font-weight:800;box-shadow:0 4px 14px #0003}
+#catchPanel{display:none;position:absolute;right:18px;bottom:82px;z-index:1300;width:min(360px,calc(100vw - 36px));background:#fffffff2;border-radius:18px;padding:16px;box-shadow:0 8px 28px #0004;font:15px system-ui}
+#catchPanel input,#catchPanel select,#catchPanel textarea{box-sizing:border-box;width:100%;margin:5px 0 10px;padding:9px;border:1px solid #bbc7ca;border-radius:10px}
+#catchPanel .row{display:flex;gap:8px}.row>*{flex:1}
+#catchPanel button{padding:10px 12px;border:0;border-radius:10px;font-weight:750}
+</style>
+<button id="catchBtn">Fang erfassen</button>
+<div id="catchPanel">
+<b style="font-size:18px">Fangjournal</b><br><small id="catchStructure">Zuerst Struktur auf Karte auswählen.</small>
+<div class="row"><select id="catchYes"><option value="true">Fang</option><option value="false">Nullfang</option></select><input id="species" placeholder="Fischart"></div>
+<div class="row"><input id="method" placeholder="Methode"><input id="lure" placeholder="Köder"></div>
+<div class="row"><input id="depth" type="number" step="0.1" placeholder="Angeltiefe m"><input id="length" type="number" step="0.1" placeholder="Länge cm"></div>
+<textarea id="catchNote" rows="2" placeholder="Notiz"></textarea>
+<div class="row"><button id="saveCatch">Lokal speichern</button><button id="closeCatch">Schliessen</button></div>
+<small>V0.20 speichert auf diesem Gerät. Wetter-/Wasserdaten werden im nächsten Schritt angebunden.</small>
+</div>
+<script>
+(()=>{
+ const $=id=>document.getElementById(id), panel=$('catchPanel');
+ $('catchBtn').onclick=()=>{panel.style.display='block'; updateSelected()};
+ $('closeCatch').onclick=()=>panel.style.display='none';
+ function selectedId(){
+   const t=document.querySelector('.leaflet-popup-content');
+   if(!t)return null;
+   const m=t.innerText.match(/OBR-[A-ZÜ]+0*\d+/); return m?m[0]:null;
+ }
+ function updateSelected(){const id=selectedId(); $('catchStructure').textContent=id?('Struktur: '+id):'Zuerst Struktur auf Karte auswählen.'}
+ $('saveCatch').onclick=()=>{
+   const structure_id=selectedId(); if(!structure_id){alert('Bitte zuerst eine Struktur auf der Karte auswählen.');return}
+   const rec={session_id:'FP-'+Date.now(),structure_id,started_at:new Date().toISOString(),
+     catch:$('catchYes').value==='true',species:$('species').value,method:$('method').value,
+     lure_bait:$('lure').value,depth_fished_m:Number($('depth').value)||null,
+     length_cm:Number($('length').value)||null,note:$('catchNote').value};
+   const a=JSON.parse(localStorage.getItem('fishpilot_catches_v02')||'[]');a.push(rec);
+   localStorage.setItem('fishpilot_catches_v02',JSON.stringify(a));
+   alert('Gespeichert: '+structure_id+' · '+(rec.catch?'Fang':'Nullfang'));
+   panel.style.display='none';
+ };
 })();
 </script>
 

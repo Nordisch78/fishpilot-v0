@@ -27,3 +27,12 @@ V0.19.1
 - Gebiet Oberried räumlich bereinigt.
 - Vier klar abgesetzte südöstliche/offshore Strukturen aus dem Oberried-Katalog entfernt.
 - Entfernte IDs: OBR-K01, OBR-N02, OBR-P01, OBR-P03
+
+
+V0.20
+- Oberried auf 8 zusammenhängende Hotspots bereinigt.
+- Entfernte isolierte südöstliche Strukturen: OBR-K03, OBR-K04, OBR-P04
+- Fangjournal V0.2 vorbereitet.
+- Fang/Nullfang, Fischart, Methode, Köder, Angeltiefe, Länge und Notiz erfassbar.
+- Speicherung zunächst lokal im Browser (kein Server/Account erforderlich).
+- Wetter- und Wasserdatenfelder für spätere API-Anbindung vorbereitet.

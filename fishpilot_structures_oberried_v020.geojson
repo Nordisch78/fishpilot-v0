@@ -1,0 +1,244 @@
+{
+  "type": "FeatureCollection",
+  "name": "FishPilot Oberried Hotspots V0.17.3",
+  "properties": {
+    "fishing_area": "Oberried",
+    "engine": "Terrain Intelligence V0.17.3",
+    "method": "strukturtypbasierte Multiskalen-Erkennung; extreme Klippen >65° ausgeschlossen",
+    "hotspot_definition": "markante Geländeform, keine Fangprognose"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.966892634519305,
+          46.7340005299386
+        ]
+      },
+      "properties": {
+        "hotspot_id": "OBR-K02",
+        "fishing_area": "Oberried",
+        "structure_type": "Kante",
+        "terrain_score_relative": 95,
+        "local_relief_20m": -0.5,
+        "local_relief_50m": -2.8,
+        "slope_deg": 13.2,
+        "slope_break_index": 31.0,
+        "shape_anisotropy": 0.18,
+        "detection_confidence": "hoch",
+        "review_status": "V0.17.3 Kandidat – noch nicht fachlich bestätigt",
+        "note": "Markante Geländeform im Fischereigebiet; keine Fangprognose.",
+        "legacy_id": "OBR-HK02",
+        "structure_id": "OBR-K02",
+        "symbol": "K",
+        "fishing_area_id": "OBR",
+        "catalog_version": "0.19"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.9777234413527225,
+          46.72721217627897
+        ]
+      },
+      "properties": {
+        "hotspot_id": "OBR-N01",
+        "fishing_area": "Oberried",
+        "structure_type": "Nase",
+        "terrain_score_relative": 95,
+        "local_relief_20m": 13.2,
+        "local_relief_50m": 20.8,
+        "slope_deg": 50.2,
+        "slope_break_index": 5.0,
+        "shape_anisotropy": 0.24,
+        "detection_confidence": "hoch",
+        "review_status": "V0.17.3 Kandidat – noch nicht fachlich bestätigt",
+        "note": "Markante Geländeform im Fischereigebiet; keine Fangprognose.",
+        "legacy_id": "OBR-HN01",
+        "structure_id": "OBR-N01",
+        "symbol": "N",
+        "fishing_area_id": "OBR",
+        "catalog_version": "0.19"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.955724679424039,
+          46.72909502570111
+        ]
+      },
+      "properties": {
+        "hotspot_id": "OBR-N03",
+        "fishing_area": "Oberried",
+        "structure_type": "Nase",
+        "terrain_score_relative": 95,
+        "local_relief_20m": 12.7,
+        "local_relief_50m": 20.5,
+        "slope_deg": 47.4,
+        "slope_break_index": 5.3,
+        "shape_anisotropy": 0.39,
+        "detection_confidence": "hoch",
+        "review_status": "V0.17.3 Kandidat – noch nicht fachlich bestätigt",
+        "note": "Markante Geländeform im Fischereigebiet; keine Fangprognose.",
+        "legacy_id": "OBR-HN03",
+        "structure_id": "OBR-N03",
+        "symbol": "N",
+        "fishing_area_id": "OBR",
+        "catalog_version": "0.19"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.96545342471664,
+          46.73399818062553
+        ]
+      },
+      "properties": {
+        "hotspot_id": "OBR-P02",
+        "fishing_area": "Oberried",
+        "structure_type": "Plateau",
+        "terrain_score_relative": 95,
+        "local_relief_20m": -0.7,
+        "local_relief_50m": 7.5,
+        "slope_deg": 9.2,
+        "slope_break_index": 21.2,
+        "shape_anisotropy": 0.44,
+        "detection_confidence": "hoch",
+        "review_status": "V0.17.3 Kandidat – noch nicht fachlich bestätigt",
+        "note": "Markante Geländeform im Fischereigebiet; keine Fangprognose.",
+        "legacy_id": "OBR-HP02",
+        "structure_id": "OBR-P02",
+        "symbol": "P",
+        "fishing_area_id": "OBR",
+        "catalog_version": "0.19"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.962265026953651,
+          46.731709953303316
+        ]
+      },
+      "properties": {
+        "hotspot_id": "OBR-R01",
+        "fishing_area": "Oberried",
+        "structure_type": "Rinne",
+        "terrain_score_relative": 95,
+        "local_relief_20m": -14.8,
+        "local_relief_50m": -36.1,
+        "slope_deg": 55.3,
+        "slope_break_index": 8.8,
+        "shape_anisotropy": 0.94,
+        "detection_confidence": "hoch",
+        "review_status": "V0.17.3 Kandidat – noch nicht fachlich bestätigt",
+        "note": "Markante Geländeform im Fischereigebiet; keine Fangprognose.",
+        "legacy_id": "OBR-HR01",
+        "structure_id": "OBR-R01",
+        "symbol": "R",
+        "fishing_area_id": "OBR",
+        "catalog_version": "0.19"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.964550294868979,
+          46.73261701150417
+        ]
+      },
+      "properties": {
+        "hotspot_id": "OBR-R02",
+        "fishing_area": "Oberried",
+        "structure_type": "Rinne",
+        "terrain_score_relative": 95,
+        "local_relief_20m": -13.2,
+        "local_relief_50m": -32.4,
+        "slope_deg": 48.3,
+        "slope_break_index": 9.6,
+        "shape_anisotropy": 0.79,
+        "detection_confidence": "hoch",
+        "review_status": "V0.17.3 Kandidat – noch nicht fachlich bestätigt",
+        "note": "Markante Geländeform im Fischereigebiet; keine Fangprognose.",
+        "legacy_id": "OBR-HR02",
+        "structure_id": "OBR-R02",
+        "symbol": "R",
+        "fishing_area_id": "OBR",
+        "catalog_version": "0.19"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.970612558335232,
+          46.73575541123561
+        ]
+      },
+      "properties": {
+        "hotspot_id": "OBR-R03",
+        "fishing_area": "Oberried",
+        "structure_type": "Rinne",
+        "terrain_score_relative": 95,
+        "local_relief_20m": -14.7,
+        "local_relief_50m": -23.9,
+        "slope_deg": 59.8,
+        "slope_break_index": 8.3,
+        "shape_anisotropy": 0.52,
+        "detection_confidence": "hoch",
+        "review_status": "V0.17.3 Kandidat – noch nicht fachlich bestätigt",
+        "note": "Markante Geländeform im Fischereigebiet; keine Fangprognose.",
+        "legacy_id": "OBR-HR03",
+        "structure_id": "OBR-R03",
+        "symbol": "R",
+        "fishing_area_id": "OBR",
+        "catalog_version": "0.19"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.9592081619952815,
+          46.730824359834195
+        ]
+      },
+      "properties": {
+        "hotspot_id": "OBR-RU01",
+        "fishing_area": "Oberried",
+        "structure_type": "Rücken",
+        "terrain_score_relative": 95,
+        "local_relief_20m": 21.5,
+        "local_relief_50m": 44.5,
+        "slope_deg": 57.8,
+        "slope_break_index": 10.9,
+        "shape_anisotropy": 0.82,
+        "detection_confidence": "hoch",
+        "review_status": "V0.17.3 Kandidat – noch nicht fachlich bestätigt",
+        "note": "Markante Geländeform im Fischereigebiet; keine Fangprognose.",
+        "legacy_id": "OBR-HB01",
+        "structure_id": "OBR-RU01",
+        "symbol": "RÜ",
+        "fishing_area_id": "OBR",
+        "catalog_version": "0.19"
+      }
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": "0.2",
+  "area_id": "OBR",
+  "description": "FishPilot Fangjournal – Oberried. Fang und Nullfang werden strukturbezogen erfasst.",
+  "fields": {
+    "session_id": {
+      "type": "string",
+      "auto": true
+    },
+    "structure_id": {
+      "type": "string",
+      "required": true
+    },
+    "started_at": {
+      "type": "datetime",
+      "auto": true
+    },
+    "ended_at": {
+      "type": "datetime"
+    },
+    "gps_lat": {
+      "type": "number",
+      "auto": true
+    },
+    "gps_lon": {
+      "type": "number",
+      "auto": true
+    },
+    "gps_accuracy_m": {
+      "type": "number",
+      "auto": true
+    },
+    "target_species": {
+      "type": "string"
+    },
+    "method": {
+      "type": "string"
+    },
+    "lure_bait": {
+      "type": "string"
+    },
+    "depth_fished_m": {
+      "type": "number"
+    },
+    "catch": {
+      "type": "boolean",
+      "required": true
+    },
+    "species": {
+      "type": "string"
+    },
+    "length_cm": {
+      "type": "number"
+    },
+    "weight_g": {
+      "type": "number"
+    },
+    "count": {
+      "type": "integer",
+      "default": 1
+    },
+    "note": {
+      "type": "string"
+    },
+    "weather": {
+      "type": "object",
+      "status": "prepared_for_api",
+      "fields": [
+        "air_temp_c",
+        "pressure_hpa",
+        "wind_speed",
+        "wind_dir",
+        "cloud_pct",
+        "precip_mm"
+      ]
+    },
+    "water": {
+      "type": "object",
+      "status": "prepared_for_api",
+      "fields": [
+        "surface_temp_c",
+        "level",
+        "clarity"
+      ]
+    }
+  }
+}
