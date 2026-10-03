@@ -1,6 +1,6 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>FishPilot · Oberried V0.15</title>
+<title>FishPilot · Oberried V0.16</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 html,body,#map{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -14,7 +14,7 @@ padding:8px 10px;border-radius:10px;box-shadow:0 2px 10px #0002;font-size:11px;l
 .sw-e{background:rgba(73,111,125,.34);border:1px solid #253f49}
 .sw-l{height:0;border-top:2px dashed #344e59;border-radius:0}
 
-/* FishPilot V0.15 – mobile structure filter */
+/* FishPilot V0.16 – mobile structure filter */
 #fpFilterBtn{
   position:absolute; top:88px; left:14px; z-index:1200;
   border:0; border-radius:12px; padding:10px 14px; font-weight:700;
@@ -104,12 +104,27 @@ max-width:min(360px,calc(100vw - 24px))}
     <button class="fp-chip" data-quality="schwach">schwach</button>
   </div>
 
-  <div class="fp-label">Datenmodell V0.15</div>
-  <div class="fp-small">Eine einzige Strukturquelle: <b>22 kanonische OBR-Strukturen</b>. Alte Analyse-Layer werden nicht mehr geladen.</div>
+  <div class="fp-label">Datenmodell V0.16</div>
+  <div class="fp-small">22 feste OBR-Strukturen. V0.16 trennt <b>Strukturtyp</b>, <b>Strukturstärke</b> und <b>Erkennungsqualität</b>.</div>
+  
+  <div class="fp-label">Erkennungsqualität</div>
+  <div class="fp-chips" id="fpConfidenceChips">
+    <button class="fp-chip active" data-confidence="all">Alle</button>
+    <button class="fp-chip" data-confidence="hoch">hoch</button>
+    <button class="fp-chip" data-confidence="mittel">mittel</button>
+    <button class="fp-chip" data-confidence="niedrig">niedrig</button>
+  </div>
+  <div class="fp-label">Prüfstatus</div>
+  <div class="fp-chips" id="fpReviewChips">
+    <button class="fp-chip active" data-review="all">Alle</button>
+    <button class="fp-chip" data-review="offen">noch nicht geprüft</button>
+    <button class="fp-chip" data-review="geprüft">geprüft</button>
+  </div>
+
   <div id="fpCount">Filter bereit</div>
 </div>
 <div id="map"></div>
-<div class="header"><b>FishPilot · Oberried</b><div>V0.15 · Clean Catalog – eine Strukturquelle, Filter & GPS</div></div>
+<div class="header"><b>FishPilot · Oberried</b><div>V0.16 · Structure Review – Qualität, Stärke, Prüfstatus & GPS</div></div>
 <div class="legend"><b>Struktur #11</b><br>
 <span class="sw sw-p"></span>Plateau-Teilbereiche<br>
 <span class="sw sw-e"></span>Oberkante ~25 m<br>
@@ -132,7 +147,7 @@ const overlays={};
 
 Promise.all([
  fetch('bathymetry.geojson').then(r=>r.json()),
- fetch('fishpilot_structure_catalog_v015.geojson').then(r=>r.json())
+ fetch('fishpilot_structure_catalog_v016_ui.geojson').then(r=>r.json())
 ]).then(([bathy,catalog])=>{
  overlays['Tiefenlinien']=L.geoJSON(bathy,{
    style:f=>{
@@ -152,8 +167,11 @@ Promise.all([
      <b>Tiefe:</b> ${depth}<br>
      <b>Gefälle:</b> ${Number(p.slope_deg||0).toFixed(1)}°<br>
      <b>Relief:</b> ${Number(p.relief_m||0).toFixed(1)} m<br>
-     <b>Ausprägung:</b> ${p.quality}<br>
-     <small>FishPilot Masterkatalog V0.15</small>`;
+     <b>Strukturstärke:</b> ${p.structure_strength}<br>
+     <b>Erkennungsqualität:</b> ${p.detection_confidence}<br>
+     <b>Prüfstatus:</b> ${p.review_status}<br>
+     <b>Warum:</b> ${p.classification_reason}<br>
+     <small>FishPilot Prüfkatalog V0.16</small>`;
  }
 
  function fpIcon(p){
@@ -165,7 +183,7 @@ Promise.all([
    });
  }
 
- overlays['FishPilot-Strukturen V0.15']=L.geoJSON(catalog,{
+ overlays['FishPilot-Strukturen V0.16']=L.geoJSON(catalog,{
    pointToLayer:(f,ll)=>L.marker(ll,{icon:fpIcon(f.properties)}),
    style:f=>({color:'#173f4d',weight:2.2,opacity:.88,fillColor:'#6f9eaa',fillOpacity:.12}),
    onEachFeature:(f,l)=>{
@@ -290,7 +308,7 @@ map.on('layeradd',function(e){
 
 <script>
 (function(){
-  let selectedType='Alle', depth='all', quality='all';
+  let selectedType='Alle', depth='all', quality='all', confidence='all', review='all';
   const btn=document.getElementById('fpFilterBtn'), panel=document.getElementById('fpFilterPanel');
   btn.addEventListener('click',()=>panel.hidden=!panel.hidden);
 
@@ -351,17 +369,22 @@ map.on('layeradd',function(e){
     if(!window.map || !map.eachLayer){ document.getElementById('fpCount').textContent='Karte lädt …'; return; }
     map.eachLayer(function(l){
       const s=layerText(l);
-      /* V0.15: Nur kanonische FishPilot-Katalogobjekte werden gefiltert.
+      /* V0.16: Nur kanonische FishPilot-Katalogobjekte werden gefiltert.
          Alte Analyseobjekte (#1, Terrain Engine etc.) bleiben davon getrennt. */
       const pp=l && l.feature && l.feature.properties ? l.feature.properties : {};
-      if(pp.catalog_version!=='0.15' || !pp.catalog_id) return;
+      if(pp.catalog_version!=='0.16' || !pp.catalog_id) return;
       if(!l._fpOriginalOpacity){
         l._fpOriginalOpacity = l.options && l.options.opacity != null ? l.options.opacity : 1;
         l._fpOriginalFillOpacity = l.options && l.options.fillOpacity != null ? l.options.fillOpacity : .2;
       }
       seen++;
       let ok=typeOK(s);
-      if(quality!=='all') ok = ok && qualityValue(l,s)===quality;
+      if(confidence!=='all') ok = ok && String(pp.detection_confidence||'').toLowerCase()===confidence;
+      if(review!=='all'){
+        const rs=String(pp.review_status||'').toLowerCase();
+        ok = ok && (review==='offen' ? rs.includes('noch nicht geprüft') : (rs.includes('geprüft') && !rs.includes('noch nicht')));
+      }
+      if(quality!=='all') ok = ok && String(pp.structure_strength||qualityValue(l,s)).toLowerCase()===quality;
       if(depth!=='all'){
         const [a,b]=depth.split(',').map(Number), r=depthRange(l,s);
         if(r!==null) ok = ok && r[1]>=a && r[0]<b;
@@ -385,6 +408,14 @@ map.on('layeradd',function(e){
   document.querySelectorAll('#fpQualityChips .fp-chip').forEach(x=>x.onclick=function(){
     document.querySelectorAll('#fpQualityChips .fp-chip').forEach(y=>y.classList.remove('active'));
     this.classList.add('active'); quality=this.dataset.quality; apply();
+  });
+  document.querySelectorAll('#fpConfidenceChips .fp-chip').forEach(x=>x.onclick=function(){
+    document.querySelectorAll('#fpConfidenceChips .fp-chip').forEach(y=>y.classList.remove('active'));
+    this.classList.add('active'); confidence=this.dataset.confidence; apply();
+  });
+  document.querySelectorAll('#fpReviewChips .fp-chip').forEach(x=>x.onclick=function(){
+    document.querySelectorAll('#fpReviewChips .fp-chip').forEach(y=>y.classList.remove('active'));
+    this.classList.add('active'); review=this.dataset.review; apply();
   });
   setTimeout(apply,1600);
 })();
