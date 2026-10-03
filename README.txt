@@ -36,3 +36,11 @@ V0.20
 - Fang/Nullfang, Fischart, Methode, Köder, Angeltiefe, Länge und Notiz erfassbar.
 - Speicherung zunächst lokal im Browser (kein Server/Account erforderlich).
 - Wetter- und Wasserdatenfelder für spätere API-Anbindung vorbereitet.
+
+
+V0.20.1
+- Letzten isolierten südöstlichen Hotspot aus Oberried entfernt: OBR-N01
+- Oberried umfasst jetzt 7 zusammenhängende Hotspots.
+- Popups um verständliche Kurzbeschreibung des Strukturtyps ergänzt.
+- Hinweis ergänzt: Erkennungsqualität = Klassifikationssicherheit, nicht Fangchance.
+- Bereich 'Eigene Angeldaten' als Vorbereitung für strukturbezogene Fangstatistik ergänzt.

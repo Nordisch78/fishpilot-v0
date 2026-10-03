@@ -1,6 +1,6 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>FishPilot · Oberried V0.20</title>
+<title>FishPilot · Oberried V0.20.1</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 html,body,#map{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -104,7 +104,7 @@ max-width:min(360px,calc(100vw - 24px))}
   <div id="fpCount">15 Strukturen im Gebiet Oberried</div>
 </div>
 <div id="map"></div>
-<div class="header"><b>FishPilot · Oberried</b><div>V0.20 · Oberried – Fangjournal · 8 Oberried-Hotspots · GPS</div></div>
+<div class="header"><b>FishPilot · Oberried</b><div>V0.20.1 · Oberried – Fangjournal · 7 Oberried-Hotspots · GPS</div></div>
 
 <div id="fp-nav" class="fp-navbox">
   <div class="fp-navrow">
@@ -123,7 +123,7 @@ const overlays={};
 
 Promise.all([
  fetch('bathymetry.geojson').then(r=>r.json()),
- fetch('fishpilot_structures_oberried_v020.geojson').then(r=>r.json())
+ fetch('fishpilot_structures_oberried_v0201.geojson').then(r=>r.json())
 ]).then(([bathy,hotspots])=>{
  overlays['Tiefenlinien']=L.geoJSON(bathy,{
    style:f=>{
@@ -375,7 +375,7 @@ map.on('layeradd',function(e){
 <div class="row"><input id="depth" type="number" step="0.1" placeholder="Angeltiefe m"><input id="length" type="number" step="0.1" placeholder="Länge cm"></div>
 <textarea id="catchNote" rows="2" placeholder="Notiz"></textarea>
 <div class="row"><button id="saveCatch">Lokal speichern</button><button id="closeCatch">Schliessen</button></div>
-<small>V0.20 speichert auf diesem Gerät. Wetter-/Wasserdaten werden im nächsten Schritt angebunden.</small>
+<small>V0.20.1 speichert auf diesem Gerät. Wetter-/Wasserdaten werden im nächsten Schritt angebunden.</small>
 </div>
 <script>
 (()=>{
@@ -399,6 +399,38 @@ map.on('layeradd',function(e){
    alert('Gespeichert: '+structure_id+' · '+(rec.catch?'Fang':'Nullfang'));
    panel.style.display='none';
  };
+})();
+</script>
+
+
+<script>
+(function(){
+  const explain = {
+    'Kante':'Abrupter Tiefenwechsel – markante Linie zwischen flacherem und tieferem Wasser.',
+    'Nase':'Vorspringende Geländeform – ragt aus einer Flanke in tieferes Wasser.',
+    'Rinne':'Vertiefte Geländeform – länglicher tieferer Bereich zwischen höherem Grund.',
+    'Plateau':'Relativ ebene Fläche – hebt sich durch geringeres Gefälle von der Umgebung ab.',
+    'Rücken':'Erhöhte Geländeform – Unterwasser-Rücken mit ausgeprägten Flanken.',
+    'Sattel':'Übergang zwischen zwei höheren Bereichen – lokal abgesenkter Verbindungspunkt.',
+    'Übergang':'Deutlicher Wechsel der Bodenform bzw. des Gefälles.'
+  };
+  function enhance(){
+    const el=document.querySelector('.leaflet-popup-content');
+    if(!el || el.dataset.fpExplain==='1') return;
+    const text=el.innerText;
+    let type=null;
+    Object.keys(explain).forEach(k=>{ if(text.includes('· '+k) || text.includes(k)) type=type||k; });
+    if(!type) return;
+    el.dataset.fpExplain='1';
+    const box=document.createElement('div');
+    box.style.cssText='margin-top:10px;padding-top:9px;border-top:1px solid #d9e0e2;font-size:13px;line-height:1.35';
+    box.innerHTML='<b>Was bedeutet das?</b><br>'+explain[type]+
+      '<br><span style="color:#53666b">Erkennungsqualität beschreibt die Sicherheit der Strukturklassifikation – nicht die Fangchance.</span>'+
+      '<br><br><b>Eigene Angeldaten</b><br><span style="color:#53666b">Noch keine strukturbezogene Statistik vorhanden.</span>';
+    el.appendChild(box);
+  }
+  document.addEventListener('click',()=>setTimeout(enhance,80),true);
+  new MutationObserver(()=>setTimeout(enhance,30)).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 
