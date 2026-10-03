@@ -1,6 +1,6 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>FishPilot · Oberried V0.16</title>
+<title>FishPilot · Oberried V0.18</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 html,body,#map{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -14,7 +14,7 @@ padding:8px 10px;border-radius:10px;box-shadow:0 2px 10px #0002;font-size:11px;l
 .sw-e{background:rgba(73,111,125,.34);border:1px solid #253f49}
 .sw-l{height:0;border-top:2px dashed #344e59;border-radius:0}
 
-/* FishPilot V0.16 – mobile structure filter */
+/* FishPilot V0.18 – mobile structure filter */
 #fpFilterBtn{
   position:absolute; top:88px; left:14px; z-index:1200;
   border:0; border-radius:12px; padding:10px 14px; font-weight:700;
@@ -46,6 +46,12 @@ padding:8px 10px;border-radius:10px;box-shadow:0 2px 10px #0002;font-size:11px;l
 }
 #fpTargetBox b{font-size:14px}.fp-small{font-size:12px;color:#555;margin-top:3px}
 
+
+#fpLegend{position:absolute;right:14px;top:88px;z-index:1100;background:rgba(255,255,255,.94);
+padding:8px 10px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.16);
+font:12px system-ui,-apple-system,sans-serif;line-height:1.7}
+#fpLegend b{font-size:12px}
+@media(max-width:700px){#fpLegend{top:104px}}
 </style>
 <style>
 .fp-navbox{position:absolute;left:12px;bottom:18px;z-index:1000;background:rgba(255,255,255,.94);
@@ -65,6 +71,7 @@ max-width:min(360px,calc(100vw - 24px))}
 </style>
 
 </head><body>
+<div id="fpLegend"><b>Oberried Hotspots</b><br>K Kante · ▲ Nase · R Rinne<br>P Plateau · B Rücken</div>
 
 <div id="fpTargetBox">
  <b>Angelpositionen</b>
@@ -72,9 +79,11 @@ max-width:min(360px,calc(100vw - 24px))}
 </div>
 
 
-<button id="fpFilterBtn" type="button">Strukturen filtern</button>
+<button id="fpFilterBtn" type="button">Oberried · Hotspots</button>
 <div id="fpFilterPanel" hidden>
-  <div class="fp-title">Strukturfilter</div>
+  <div class="fp-title">Fischereigebiet Oberried</div>
+  <div class="fp-small">15 markante Gelände-Hotspots aus dem 1-m-Höhenmodell. Hotspot bedeutet Geländeform – nicht Fanggarantie.</div>
+
   <div class="fp-label">Strukturtyp</div>
   <div class="fp-chips" id="fpTypeChips">
     <button class="fp-chip active" data-type="Alle">Alle</button>
@@ -82,31 +91,9 @@ max-width:min(360px,calc(100vw - 24px))}
     <button class="fp-chip" data-type="Nase">Nasen</button>
     <button class="fp-chip" data-type="Rinne">Rinnen</button>
     <button class="fp-chip" data-type="Plateau">Plateaus</button>
-    <button class="fp-chip" data-type="Sattel">Sättel</button>
-    <button class="fp-chip" data-type="Ruecken">Rücken</button>
-    <button class="fp-chip" data-type="Uebergang">Übergänge</button>
-  </div>
-  <div class="fp-label">Tiefe</div>
-  <div class="fp-chips" id="fpDepthChips">
-    <button class="fp-chip active" data-depth="all">Alle</button>
-    <button class="fp-chip" data-depth="0,10">0–10 m</button>
-    <button class="fp-chip" data-depth="10,20">10–20 m</button>
-    <button class="fp-chip" data-depth="20,40">20–40 m</button>
-    <button class="fp-chip" data-depth="40,80">40–80 m</button>
-    <button class="fp-chip" data-depth="80,9999">&gt;80 m</button>
+    <button class="fp-chip" data-type="Rücken">Rücken</button>
   </div>
 
-  <div class="fp-label">Ausprägung</div>
-  <div class="fp-chips" id="fpQualityChips">
-    <button class="fp-chip active" data-quality="all">Alle</button>
-    <button class="fp-chip" data-quality="stark">stark</button>
-    <button class="fp-chip" data-quality="mittel">mittel</button>
-    <button class="fp-chip" data-quality="schwach">schwach</button>
-  </div>
-
-  <div class="fp-label">Datenmodell V0.16</div>
-  <div class="fp-small">22 feste OBR-Strukturen. V0.16 trennt <b>Strukturtyp</b>, <b>Strukturstärke</b> und <b>Erkennungsqualität</b>.</div>
-  
   <div class="fp-label">Erkennungsqualität</div>
   <div class="fp-chips" id="fpConfidenceChips">
     <button class="fp-chip active" data-confidence="all">Alle</button>
@@ -114,17 +101,10 @@ max-width:min(360px,calc(100vw - 24px))}
     <button class="fp-chip" data-confidence="mittel">mittel</button>
     <button class="fp-chip" data-confidence="niedrig">niedrig</button>
   </div>
-  <div class="fp-label">Prüfstatus</div>
-  <div class="fp-chips" id="fpReviewChips">
-    <button class="fp-chip active" data-review="all">Alle</button>
-    <button class="fp-chip" data-review="offen">noch nicht geprüft</button>
-    <button class="fp-chip" data-review="geprüft">geprüft</button>
-  </div>
-
-  <div id="fpCount">Filter bereit</div>
+  <div id="fpCount">15 Hotspots im Gebiet Oberried</div>
 </div>
 <div id="map"></div>
-<div class="header"><b>FishPilot · Oberried</b><div>V0.16 · Structure Review – Qualität, Stärke, Prüfstatus & GPS</div></div>
+<div class="header"><b>FishPilot · Oberried</b><div>V0.18 · Fishing Areas – Oberried Hotspots & GPS</div></div>
 <div class="legend"><b>Struktur #11</b><br>
 <span class="sw sw-p"></span>Plateau-Teilbereiche<br>
 <span class="sw sw-e"></span>Oberkante ~25 m<br>
@@ -147,8 +127,8 @@ const overlays={};
 
 Promise.all([
  fetch('bathymetry.geojson').then(r=>r.json()),
- fetch('fishpilot_structure_catalog_v016_ui.geojson').then(r=>r.json())
-]).then(([bathy,catalog])=>{
+ fetch('fishpilot_hotspots_oberried_v0173.geojson').then(r=>r.json())
+]).then(([bathy,hotspots])=>{
  overlays['Tiefenlinien']=L.geoJSON(bathy,{
    style:f=>{
      const d=Number(f.properties.depth_m||0);
@@ -159,40 +139,49 @@ Promise.all([
    }
  }).addTo(map);
 
- function fpPopup(p){
-   const lo=Number(p.depth_min||0), hi=Number(p.depth_max||lo);
-   const depth=Math.abs(hi-lo)<0.05 ? lo.toFixed(1)+' m' : lo.toFixed(1)+'–'+hi.toFixed(1)+' m';
-   return `<b>${p.catalog_id} · ${p.structure_type}</b><br>
-     ${p.catalog_name||p.name||''}<br>
-     <b>Tiefe:</b> ${depth}<br>
-     <b>Gefälle:</b> ${Number(p.slope_deg||0).toFixed(1)}°<br>
-     <b>Relief:</b> ${Number(p.relief_m||0).toFixed(1)} m<br>
-     <b>Strukturstärke:</b> ${p.structure_strength}<br>
-     <b>Erkennungsqualität:</b> ${p.detection_confidence}<br>
-     <b>Prüfstatus:</b> ${p.review_status}<br>
-     <b>Warum:</b> ${p.classification_reason}<br>
-     <small>FishPilot Prüfkatalog V0.16</small>`;
- }
-
- function fpIcon(p){
-   const symbols={Kante:'K',Nase:'▲',Rinne:'R',Plateau:'P',Sattel:'S',Rücken:'B',Übergang:'U'};
+ const symbols={
+   'Kante / Gefällewechsel':'K',
+   'Nase / Vorsprung':'▲',
+   'Rinne':'R',
+   'Plateau / Terrasse':'P',
+   'Rücken':'B'
+ };
+ function hotspotIcon(p){
    return L.divIcon({
      className:'',
-     html:`<div style="width:30px;height:30px;border-radius:50%;background:white;border:2px solid #173f4d;box-shadow:0 1px 5px #555;display:flex;align-items:center;justify-content:center;font-weight:800;color:#173f4d">${symbols[p.structure_type]||'•'}</div>`,
-     iconSize:[30,30],iconAnchor:[15,15]
+     html:`<div style="width:32px;height:32px;border-radius:50%;background:white;border:3px solid #173f4d;box-shadow:0 1px 5px #555;display:flex;align-items:center;justify-content:center;font-weight:800;color:#173f4d">${symbols[p.structure_type]||'•'}</div>`,
+     iconSize:[32,32],iconAnchor:[16,16],popupAnchor:[0,-17]
    });
  }
+ function hotspotPopup(p){
+   return `<b>${p.hotspot_id} · ${p.structure_type}</b><br>
+     <b>Fischereigebiet:</b> ${p.fishing_area}<br>
+     <b>Gefälle:</b> ${Number(p.slope_deg||0).toFixed(1)}°<br>
+     <b>Relief 20 m:</b> ${Number(p.local_relief_20m||0).toFixed(1)} m<br>
+     <b>Relief 50 m:</b> ${Number(p.local_relief_50m||0).toFixed(1)} m<br>
+     <b>Gefällewechsel:</b> ${Number(p.slope_break_index||0).toFixed(1)}<br>
+     <b>Erkennungsqualität:</b> ${p.detection_confidence}<br>
+     <small>Markante Geländeform · keine Fangprognose</small>`;
+ }
 
- overlays['FishPilot-Strukturen V0.16']=L.geoJSON(catalog,{
-   pointToLayer:(f,ll)=>L.marker(ll,{icon:fpIcon(f.properties)}),
-   style:f=>({color:'#173f4d',weight:2.2,opacity:.88,fillColor:'#6f9eaa',fillOpacity:.12}),
+ window.fpHotspotLayer=L.geoJSON(hotspots,{
+   pointToLayer:(f,ll)=>L.marker(ll,{icon:hotspotIcon(f.properties)}),
    onEachFeature:(f,l)=>{
-     l.bindPopup(fpPopup(f.properties));
-     l.on('click',()=>fpSetTarget(l,f.properties));
+     l.bindPopup(hotspotPopup(f.properties),{maxWidth:390});
+     l.on('click',()=>fpSetTarget(l,{
+       structure_id:f.properties.hotspot_id,
+       catalog_id:f.properties.hotspot_id,
+       structure_type:f.properties.structure_type
+     }));
    }
  }).addTo(map);
+ overlays['Oberried · Terrain-Hotspots']=window.fpHotspotLayer;
 
  L.control.layers({'OpenStreetMap':osm},overlays,{collapsed:false}).addTo(map);
+
+ // Gebiet Oberried aus den Hotspots ableiten und Karte darauf fokussieren.
+ const hb=window.fpHotspotLayer.getBounds();
+ if(hb.isValid()) map.fitBounds(hb.pad(.18));
 });
 
 // ---- FishPilot V0.10 GPS navigation ----
@@ -308,116 +297,44 @@ map.on('layeradd',function(e){
 
 <script>
 (function(){
-  let selectedType='Alle', depth='all', quality='all', confidence='all', review='all';
-  const btn=document.getElementById('fpFilterBtn'), panel=document.getElementById('fpFilterPanel');
-  btn.addEventListener('click',()=>panel.hidden=!panel.hidden);
+ let selectedType='Alle', confidence='all';
+ const btn=document.getElementById('fpFilterBtn'), panel=document.getElementById('fpFilterPanel');
+ if(btn) btn.addEventListener('click',()=>panel.hidden=!panel.hidden);
 
-  function layerText(l){
-    let s='';
-    if(l && l.feature && l.feature.properties) s += ' '+JSON.stringify(l.feature.properties);
-    if(l && l.getPopup && l.getPopup() && l.getPopup().getContent) s += ' '+String(l.getPopup().getContent());
-    return s.toLowerCase();
-  }
-  function typeOK(s){
-    if(selectedType==='Alle') return true;
-    const keys={
-      Kante:['kante','steilabbruch','hangstufe'],
-      Nase:['nase','vorsprung'],
-      Rinne:['rinne','einbuchtung'],
-      Plateau:['plateau','terrasse'],
-      Sattel:['sattel'],
-      Ruecken:['rücken','ruecken','erhebung'],
-      Uebergang:['übergang','uebergang']
-    };
-    return (keys[selectedType]||[]).some(k=>s.includes(k));
-  }
-  function depthRange(l,s){
-    const p=l && l.feature && l.feature.properties ? l.feature.properties : {};
-    let lo=null, hi=null;
-    const pairs=[['depth_min','depth_max'],['tiefe_min','tiefe_max'],['min_depth','max_depth']];
-    for(const [a,b] of pairs){
-      const x=parseFloat(p[a]), y=parseFloat(p[b]);
-      if(Number.isFinite(x) && Number.isFinite(y)){lo=Math.abs(x);hi=Math.abs(y);break;}
-    }
-    if(lo===null){
-      let m=s.match(/tiefe[^0-9]{0,20}([0-9]+(?:[.,][0-9]+)?)(?:\s*[–—-]\s*([0-9]+(?:[.,][0-9]+)?))?/i);
-      if(m){lo=parseFloat(m[1].replace(',','.'));hi=m[2]?parseFloat(m[2].replace(',','.')):lo;}
-    }
-    if(lo===null) return null;
-    return [Math.min(lo,hi),Math.max(lo,hi)];
-  }
-
-  function qualityValue(l,s){
-    const p=l && l.feature && l.feature.properties ? l.feature.properties : {};
-    let q=String(p.quality || p.auspraegung || p.strength || '').toLowerCase();
-    if(q) return q;
-    let slope=null, relief=null;
-    for(const k of ['slope','slope_deg','gefaelle','median_slope']){
-      const v=parseFloat(p[k]); if(Number.isFinite(v)){slope=v;break;}
-    }
-    for(const k of ['relief','relief_m','local_relief','reliefindex']){
-      const v=parseFloat(p[k]); if(Number.isFinite(v)){relief=v;break;}
-    }
-    if(slope===null){ let m=s.match(/gef[aä]lle[^0-9]{0,20}([0-9]+(?:[.,][0-9]+)?)/i); if(m)slope=parseFloat(m[1].replace(',','.')); }
-    if(relief===null){ let m=s.match(/relief(?:index)?[^0-9]{0,20}([0-9]+(?:[.,][0-9]+)?)/i); if(m)relief=parseFloat(m[1].replace(',','.')); }
-    const score=(slope||0)*0.65+(relief||0)*0.8;
-    return score>=22?'stark':score>=11?'mittel':'schwach';
-  }
-
-  function apply(){
-    let seen=0, shown=0;
-    if(!window.map || !map.eachLayer){ document.getElementById('fpCount').textContent='Karte lädt …'; return; }
-    map.eachLayer(function(l){
-      const s=layerText(l);
-      /* V0.16: Nur kanonische FishPilot-Katalogobjekte werden gefiltert.
-         Alte Analyseobjekte (#1, Terrain Engine etc.) bleiben davon getrennt. */
-      const pp=l && l.feature && l.feature.properties ? l.feature.properties : {};
-      if(pp.catalog_version!=='0.16' || !pp.catalog_id) return;
-      if(!l._fpOriginalOpacity){
-        l._fpOriginalOpacity = l.options && l.options.opacity != null ? l.options.opacity : 1;
-        l._fpOriginalFillOpacity = l.options && l.options.fillOpacity != null ? l.options.fillOpacity : .2;
-      }
-      seen++;
-      let ok=typeOK(s);
-      if(confidence!=='all') ok = ok && String(pp.detection_confidence||'').toLowerCase()===confidence;
-      if(review!=='all'){
-        const rs=String(pp.review_status||'').toLowerCase();
-        ok = ok && (review==='offen' ? rs.includes('noch nicht geprüft') : (rs.includes('geprüft') && !rs.includes('noch nicht')));
-      }
-      if(quality!=='all') ok = ok && String(pp.structure_strength||qualityValue(l,s)).toLowerCase()===quality;
-      if(depth!=='all'){
-        const [a,b]=depth.split(',').map(Number), r=depthRange(l,s);
-        if(r!==null) ok = ok && r[1]>=a && r[0]<b;
-      }
-      if(l.setStyle){
-        l.setStyle({opacity:ok?l._fpOriginalOpacity:0, fillOpacity:ok?l._fpOriginalFillOpacity:0});
-        if(l.getElement) { const e=l.getElement(); if(e) e.style.pointerEvents=ok?'':'none'; }
-      } else if(l.setOpacity) l.setOpacity(ok?1:0);
-      if(ok) shown++;
-    });
-    document.getElementById('fpCount').textContent = shown+' von '+seen+' FishPilot-Strukturen sichtbar';
-  }
-  document.querySelectorAll('#fpTypeChips .fp-chip').forEach(x=>x.onclick=function(){
-    document.querySelectorAll('#fpTypeChips .fp-chip').forEach(y=>y.classList.remove('active'));
-    this.classList.add('active'); selectedType=this.dataset.type; apply();
-  });
-  document.querySelectorAll('#fpDepthChips .fp-chip').forEach(x=>x.onclick=function(){
-    document.querySelectorAll('#fpDepthChips .fp-chip').forEach(y=>y.classList.remove('active'));
-    this.classList.add('active'); depth=this.dataset.depth; apply();
-  });
-  document.querySelectorAll('#fpQualityChips .fp-chip').forEach(x=>x.onclick=function(){
-    document.querySelectorAll('#fpQualityChips .fp-chip').forEach(y=>y.classList.remove('active'));
-    this.classList.add('active'); quality=this.dataset.quality; apply();
-  });
-  document.querySelectorAll('#fpConfidenceChips .fp-chip').forEach(x=>x.onclick=function(){
-    document.querySelectorAll('#fpConfidenceChips .fp-chip').forEach(y=>y.classList.remove('active'));
-    this.classList.add('active'); confidence=this.dataset.confidence; apply();
-  });
-  document.querySelectorAll('#fpReviewChips .fp-chip').forEach(x=>x.onclick=function(){
-    document.querySelectorAll('#fpReviewChips .fp-chip').forEach(y=>y.classList.remove('active'));
-    this.classList.add('active'); review=this.dataset.review; apply();
-  });
-  setTimeout(apply,1600);
+ function matches(p){
+   let ok=true;
+   if(selectedType!=='Alle'){
+     const t=String(p.structure_type||'');
+     ok = ok && t.startsWith(selectedType);
+   }
+   if(confidence!=='all'){
+     ok = ok && String(p.detection_confidence||'').toLowerCase()===confidence;
+   }
+   return ok;
+ }
+ function apply(){
+   if(!window.fpHotspotLayer) return;
+   let shown=0,total=0;
+   window.fpHotspotLayer.eachLayer(l=>{
+     const p=l.feature && l.feature.properties ? l.feature.properties : {};
+     total++;
+     const ok=matches(p);
+     if(l.setOpacity) l.setOpacity(ok?1:0);
+     if(l._icon) l._icon.style.pointerEvents=ok?'':'none';
+     if(ok) shown++;
+   });
+   const c=document.getElementById('fpCount');
+   if(c) c.textContent=`${shown} von ${total} Hotspots sichtbar`;
+ }
+ document.querySelectorAll('#fpTypeChips .fp-chip').forEach(x=>x.onclick=function(){
+   document.querySelectorAll('#fpTypeChips .fp-chip').forEach(y=>y.classList.remove('active'));
+   this.classList.add('active'); selectedType=this.dataset.type; apply();
+ });
+ document.querySelectorAll('#fpConfidenceChips .fp-chip').forEach(x=>x.onclick=function(){
+   document.querySelectorAll('#fpConfidenceChips .fp-chip').forEach(y=>y.classList.remove('active'));
+   this.classList.add('active'); confidence=this.dataset.confidence; apply();
+ });
+ setTimeout(apply,1300);
 })();
 </script>
 
