@@ -1,6 +1,6 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>FishPilot · Oberried V0.18</title>
+<title>FishPilot · Oberried V0.19</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 html,body,#map{height:100%;margin:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -71,7 +71,7 @@ max-width:min(360px,calc(100vw - 24px))}
 </style>
 
 </head><body>
-<div id="fpLegend"><b>Oberried Hotspots</b><br>K Kante · ▲ Nase · R Rinne<br>P Plateau · B Rücken</div>
+<div id="fpLegend"><b>Oberried · Strukturen</b><br>K Kante · N Nase · R Rinne<br>P Plateau · RÜ Rücken</div>
 
 <div id="fpTargetBox">
  <b>Angelpositionen</b>
@@ -82,7 +82,7 @@ max-width:min(360px,calc(100vw - 24px))}
 <button id="fpFilterBtn" type="button">Oberried · Hotspots</button>
 <div id="fpFilterPanel" hidden>
   <div class="fp-title">Fischereigebiet Oberried</div>
-  <div class="fp-small">15 markante Gelände-Hotspots aus dem 1-m-Höhenmodell. Hotspot bedeutet Geländeform – nicht Fanggarantie.</div>
+  <div class="fp-small">15 permanente FishPilot-Strukturen im Gebiet Oberried. Struktur bedeutet Geländeform – nicht Fanggarantie.</div>
 
   <div class="fp-label">Strukturtyp</div>
   <div class="fp-chips" id="fpTypeChips">
@@ -101,15 +101,11 @@ max-width:min(360px,calc(100vw - 24px))}
     <button class="fp-chip" data-confidence="mittel">mittel</button>
     <button class="fp-chip" data-confidence="niedrig">niedrig</button>
   </div>
-  <div id="fpCount">15 Hotspots im Gebiet Oberried</div>
+  <div id="fpCount">15 Strukturen im Gebiet Oberried</div>
 </div>
 <div id="map"></div>
-<div class="header"><b>FishPilot · Oberried</b><div>V0.18 · Fishing Areas – Oberried Hotspots & GPS</div></div>
-<div class="legend"><b>Struktur #11</b><br>
-<span class="sw sw-p"></span>Plateau-Teilbereiche<br>
-<span class="sw sw-e"></span>Oberkante ~25 m<br>
-<span class="sw sw-l"></span>Unterkante ~50 m
-</div>
+<div class="header"><b>FishPilot · Oberried</b><div>V0.19 · Oberried – permanente Struktur-IDs & GPS</div></div>
+
 <div id="fp-nav" class="fp-navbox">
   <div class="fp-navrow">
     <button id="fp-locate" class="fp-btn">Meine Position</button>
@@ -127,7 +123,7 @@ const overlays={};
 
 Promise.all([
  fetch('bathymetry.geojson').then(r=>r.json()),
- fetch('fishpilot_hotspots_oberried_v0173.geojson').then(r=>r.json())
+ fetch('fishpilot_structures_oberried_v019.geojson').then(r=>r.json())
 ]).then(([bathy,hotspots])=>{
  overlays['Tiefenlinien']=L.geoJSON(bathy,{
    style:f=>{
@@ -140,11 +136,11 @@ Promise.all([
  }).addTo(map);
 
  const symbols={
-   'Kante / Gefällewechsel':'K',
-   'Nase / Vorsprung':'▲',
-   'Rinne':'R',
-   'Plateau / Terrasse':'P',
-   'Rücken':'B'
+    'Kante':'K',
+    'Nase':'N',
+    'Rinne':'R',
+    'Plateau':'P',
+    'Rücken':'RÜ'
  };
  function hotspotIcon(p){
    return L.divIcon({
@@ -154,7 +150,7 @@ Promise.all([
    });
  }
  function hotspotPopup(p){
-   return `<b>${p.hotspot_id} · ${p.structure_type}</b><br>
+   return `<b>${p.structure_id} · ${p.structure_type}</b><br>
      <b>Fischereigebiet:</b> ${p.fishing_area}<br>
      <b>Gefälle:</b> ${Number(p.slope_deg||0).toFixed(1)}°<br>
      <b>Relief 20 m:</b> ${Number(p.local_relief_20m||0).toFixed(1)} m<br>
@@ -324,7 +320,7 @@ map.on('layeradd',function(e){
      if(ok) shown++;
    });
    const c=document.getElementById('fpCount');
-   if(c) c.textContent=`${shown} von ${total} Hotspots sichtbar`;
+   if(c) c.textContent=`${shown} von ${total} Strukturen sichtbar`;
  }
  document.querySelectorAll('#fpTypeChips .fp-chip').forEach(x=>x.onclick=function(){
    document.querySelectorAll('#fpTypeChips .fp-chip').forEach(y=>y.classList.remove('active'));

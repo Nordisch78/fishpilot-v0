@@ -1,0 +1,41 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "area_id": "OBR",
+        "name": "Oberried",
+        "version": "0.19",
+        "note": "FishPilot Arbeitsgebiet Oberried; gegenüberliegendes Seeufer ausgeschlossen."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.939412224333578,
+              46.717733309545224
+            ],
+            [
+              7.981723441352722,
+              46.717733309545224
+            ],
+            [
+              7.981723441352722,
+              46.73775541123561
+            ],
+            [
+              7.939412224333578,
+              46.73775541123561
+            ],
+            [
+              7.939412224333578,
+              46.717733309545224
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
