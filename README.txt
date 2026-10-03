@@ -21,3 +21,9 @@ Vor der Ausweitung auf weitere Gebiete sollte die fachlich gewünschte Ufergrenz
 
 Nächster Entwicklungsschritt:
 Fangkatalog/Session-Log mit Struktur-ID, Nullfang-Sessions, Methode/Köder sowie Wetter- und Wasserdaten.
+
+
+V0.19.1
+- Gebiet Oberried räumlich bereinigt.
+- Vier klar abgesetzte südöstliche/offshore Strukturen aus dem Oberried-Katalog entfernt.
+- Entfernte IDs: OBR-K01, OBR-N02, OBR-P01, OBR-P03
